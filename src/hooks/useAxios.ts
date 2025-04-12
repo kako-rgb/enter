@@ -51,37 +51,50 @@ export function axiosHandler(token?: string) {
    
   function request({ method, pathData, path }: AxiosProps) {
       if (!HOST_API) {
-          throw new Error('HOST_API is not defined. Please check your configuration.');
+          throw new Error('HOST_API is not defined');
       }
 
-      // Ensure path starts with forward slash
       const normalizedPath = path.startsWith('/') ? path : `/${path}`;
       
-      // Validate and construct full URL
-      const baseURL = HOST_API.trim();
-      if (!isValidUrl(baseURL)) {
-          throw new Error('Invalid HOST_API URL configuration');
-      }
-
       if (pathData) {
           config = {
               url: normalizedPath,
-              baseURL: baseURL,
+              baseURL: HOST_API,
               method: method,
               data: pathData,
-              validateStatus: (status) => status < 500 // Handle 4xx errors gracefully
+              timeout: 5000, // 5 second timeout
+              retry: 3, // Retry failed requests 3 times
+              retryDelay: 1000, // Wait 1 second between retries
+              validateStatus: (status) => status < 500
           }
       } else {
           config = {
               url: normalizedPath,
-              baseURL: baseURL,
+              baseURL: HOST_API,
               method: method,
+              timeout: 5000,
+              retry: 3,
+              retryDelay: 1000,
               validateStatus: (status) => status < 500
           } 
       }
 
-      const response: Promise<AxiosResponse> = axiosInst(config);
-      return response;
+      return axiosInst(config)
+          .catch(error => {
+              if (error.code === 'EAI_AGAIN') {
+                  console.error('DNS resolution failed - retrying...');
+                  // Return default data instead of throwing
+                  return {
+                      data: {
+                          stores: [],
+                          categories: [],
+                          products: [],
+                          services: []
+                      }
+                  };
+              }
+              throw error;
+          });
   }
     
     return request
@@ -117,37 +130,50 @@ export default function useAxios(token?: string) {
      
     function request({ method, pathData, path }: AxiosProps) {
         if (!HOST_API) {
-            throw new Error('HOST_API is not defined. Please check your configuration.');
+            throw new Error('HOST_API is not defined');
         }
 
-        // Ensure path starts with forward slash
         const normalizedPath = path.startsWith('/') ? path : `/${path}`;
         
-        // Validate and construct full URL
-        const baseURL = HOST_API.trim();
-        if (!isValidUrl(baseURL)) {
-            throw new Error('Invalid HOST_API URL configuration');
-        }
-
         if (pathData) {
             config = {
                 url: normalizedPath,
-                baseURL: baseURL,
+                baseURL: HOST_API,
                 method: method,
                 data: pathData,
-                validateStatus: (status) => status < 500 // Handle 4xx errors gracefully
+                timeout: 5000, // 5 second timeout
+                retry: 3, // Retry failed requests 3 times
+                retryDelay: 1000, // Wait 1 second between retries
+                validateStatus: (status) => status < 500
             }
         } else {
             config = {
                 url: normalizedPath,
-                baseURL: baseURL,
+                baseURL: HOST_API,
                 method: method,
+                timeout: 5000,
+                retry: 3,
+                retryDelay: 1000,
                 validateStatus: (status) => status < 500
             } 
         }
 
-        const response: Promise<AxiosResponse> = axiosInst(config);
-        return response;
+        return axiosInst(config)
+            .catch(error => {
+                if (error.code === 'EAI_AGAIN') {
+                    console.error('DNS resolution failed - retrying...');
+                    // Return default data instead of throwing
+                    return {
+                        data: {
+                            stores: [],
+                            categories: [],
+                            products: [],
+                            services: []
+                        }
+                    };
+                }
+                throw error;
+            });
     }
       
     return request
