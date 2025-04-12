@@ -13,10 +13,16 @@ export default async function Home() {
     const response = await request({
       method: 'get',
       path: '/?prodLimit=8&servLimit=8&storeLimit=3'
+    }).catch(error => {
+      console.error('API Request failed:', error);
+      return { data: { stores: [], categories: [], products: [], services: [] } };
     });
 
-    // Ensure stores has a default value if response.data is undefined
+    // Ensure data has default values
     const stores = response?.data?.stores || [];
+    const categories = response?.data?.categories || [];
+    const products = response?.data?.products || [];
+    const services = response?.data?.services || [];
 
     return (
       <>
@@ -27,14 +33,15 @@ export default async function Home() {
         <PopularServices />
         <TopRatedVendors stores={stores} />
         <Setter
-          categories={response?.data?.categories || []}
-          products={response?.data?.products || []}
-          services={response?.data?.services || []}
+          categories={categories}
+          products={products}
+          services={services}
         />
       </>
     );
   } catch (error) {
     console.error('Error in Home component:', error);
-    throw error; // This will be caught by the error boundary
+    // Return fallback UI
+    return <div>Something went wrong. Please try again later.</div>;
   }
 }

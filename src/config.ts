@@ -37,7 +37,9 @@ export const FONT_FAMILY = Inter({
     display: 'swap'
 });
 
-export const HOST_API = process.env.NEXT_PUBLIC_API_URL || 'https://live-1xx5cinbd-kako-rgbs-projects.vercel.app';
+export const HOST_API = process.env.NEXT_PUBLIC_API_URL 
+  ? process.env.NEXT_PUBLIC_API_URL.trim()
+  : 'https://live-c64ezvp8q-kako-rgbs-projects.vercel.app/api';
 
 export const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET;
 
@@ -48,3 +50,12 @@ export const FIREBASE_STORAGE_BUCKET = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_
 export const FIREBASE_MESSAGING_SENDER_ID = process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
 export const FIREBASE_APP_ID = process.env.NEXT_PUBLIC_FIREBASE_APP_ID;
 export const FIREBASE_MEASUREMENT_ID = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID;
+
+export const isValidUrl = (url: string) => {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}

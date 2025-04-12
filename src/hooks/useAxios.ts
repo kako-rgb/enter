@@ -1,4 +1,4 @@
-import { HOST_API } from '@/config';
+import { HOST_API, isValidUrl } from '@/config';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, RawAxiosRequestHeaders } from 'axios';
 import { signOut } from 'next-auth/react';
 
@@ -47,25 +47,27 @@ export function axiosHandler(token?: string) {
       // Ensure path starts with forward slash
       const normalizedPath = path.startsWith('/') ? path : `/${path}`;
       
+      // Validate and construct full URL
+      const baseURL = HOST_API.trim();
+      if (!isValidUrl(baseURL)) {
+          throw new Error('Invalid HOST_API URL configuration');
+      }
+
       if (pathData) {
           config = {
               url: normalizedPath,
-              baseURL: HOST_API,
+              baseURL: baseURL,
               method: method,
-              data: pathData
+              data: pathData,
+              validateStatus: (status) => status < 500 // Handle 4xx errors gracefully
           }
       } else {
           config = {
               url: normalizedPath,
-              baseURL: HOST_API,
-              method: method    
+              baseURL: baseURL,
+              method: method,
+              validateStatus: (status) => status < 500
           } 
-      }
-
-      // Ensure baseURL is properly formatted
-      const baseURL = typeof HOST_API === 'string' && HOST_API.trim();
-      if (baseURL && !baseURL.startsWith('http://') && !baseURL.startsWith('https://')) {
-          config.baseURL = `https://${baseURL}`;
       }
 
       const response: Promise<AxiosResponse> = axiosInst(config);
@@ -115,25 +117,27 @@ export default function useAxios(token?: string) {
         // Ensure path starts with forward slash
         const normalizedPath = path.startsWith('/') ? path : `/${path}`;
         
+        // Validate and construct full URL
+        const baseURL = HOST_API.trim();
+        if (!isValidUrl(baseURL)) {
+            throw new Error('Invalid HOST_API URL configuration');
+        }
+
         if (pathData) {
             config = {
                 url: normalizedPath,
-                baseURL: HOST_API,
+                baseURL: baseURL,
                 method: method,
-                data: pathData
+                data: pathData,
+                validateStatus: (status) => status < 500 // Handle 4xx errors gracefully
             }
         } else {
             config = {
                 url: normalizedPath,
-                baseURL: HOST_API,
-                method: method    
+                baseURL: baseURL,
+                method: method,
+                validateStatus: (status) => status < 500
             } 
-        }
-
-        // Ensure baseURL is properly formatted
-        const baseURL = typeof HOST_API === 'string' && HOST_API.trim();
-        if (baseURL && !baseURL.startsWith('http://') && !baseURL.startsWith('https://')) {
-            config.baseURL = `https://${baseURL}`;
         }
 
         const response: Promise<AxiosResponse> = axiosInst(config);
