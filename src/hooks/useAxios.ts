@@ -54,47 +54,18 @@ export function axiosHandler(token?: string) {
           throw new Error('HOST_API is not defined');
       }
 
+      // Ensure path starts with forward slash and is properly encoded
       const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+      const encodedPath = encodeURI(normalizedPath);
       
-      if (pathData) {
-          config = {
-              url: normalizedPath,
-              baseURL: HOST_API,
-              method: method,
-              data: pathData,
-              timeout: 5000, // 5 second timeout
-              retry: 3, // Retry failed requests 3 times
-              retryDelay: 1000, // Wait 1 second between retries
-              validateStatus: (status) => status < 500
-          }
-      } else {
-          config = {
-              url: normalizedPath,
-              baseURL: HOST_API,
-              method: method,
-              timeout: 5000,
-              retry: 3,
-              retryDelay: 1000,
-              validateStatus: (status) => status < 500
-          } 
-      }
+      config = {
+          url: encodedPath,
+          baseURL: HOST_API,
+          method: method,
+          ...(pathData && { data: pathData })
+      };
 
-      return axiosInst(config)
-          .catch(error => {
-              if (error.code === 'EAI_AGAIN') {
-                  console.error('DNS resolution failed - retrying...');
-                  // Return default data instead of throwing
-                  return {
-                      data: {
-                          stores: [],
-                          categories: [],
-                          products: [],
-                          services: []
-                      }
-                  };
-              }
-              throw error;
-          });
+      return axiosInst(config);
   }
     
     return request
@@ -133,47 +104,18 @@ export default function useAxios(token?: string) {
             throw new Error('HOST_API is not defined');
         }
 
+        // Ensure path starts with forward slash and is properly encoded
         const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+        const encodedPath = encodeURI(normalizedPath);
         
-        if (pathData) {
-            config = {
-                url: normalizedPath,
-                baseURL: HOST_API,
-                method: method,
-                data: pathData,
-                timeout: 5000, // 5 second timeout
-                retry: 3, // Retry failed requests 3 times
-                retryDelay: 1000, // Wait 1 second between retries
-                validateStatus: (status) => status < 500
-            }
-        } else {
-            config = {
-                url: normalizedPath,
-                baseURL: HOST_API,
-                method: method,
-                timeout: 5000,
-                retry: 3,
-                retryDelay: 1000,
-                validateStatus: (status) => status < 500
-            } 
-        }
+        config = {
+            url: encodedPath,
+            baseURL: HOST_API,
+            method: method,
+            ...(pathData && { data: pathData })
+        };
 
-        return axiosInst(config)
-            .catch(error => {
-                if (error.code === 'EAI_AGAIN') {
-                    console.error('DNS resolution failed - retrying...');
-                    // Return default data instead of throwing
-                    return {
-                        data: {
-                            stores: [],
-                            categories: [],
-                            products: [],
-                            services: []
-                        }
-                    };
-                }
-                throw error;
-            });
+        return axiosInst(config);
     }
       
     return request
