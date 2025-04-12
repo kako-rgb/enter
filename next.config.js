@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['@mui/material'],
-  },
+  transpilePackages: ['@mui/material'],
   typescript: {
     ignoreBuildErrors: true,
   },

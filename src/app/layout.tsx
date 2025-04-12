@@ -1,15 +1,20 @@
-import type { Metadata } from "next";
-import { FONT_FAMILY } from "@/config";
+'use client'
 
-export const metadata: Metadata = {
-  title: "Your App",
-  description: "Your app description",
-};
+import { SessionProvider } from 'next-auth/react'
+import { FONT_FAMILY } from '@/config'
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en" className={FONT_FAMILY.className}>
-      <body>{children}</body>
+      <body>
+        <SessionProvider>
+          {children}
+        </SessionProvider>
+      </body>
     </html>
-  );
+  )
 }

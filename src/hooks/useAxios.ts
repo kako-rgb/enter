@@ -15,6 +15,16 @@ type AxiosProps = {
     pathData?: any
 }
 
+const handleResponse = async (response: AxiosResponse) => {
+  if (response.status === 401) {
+    console.log('Error');
+    if (typeof window !== 'undefined') {
+      await signOut();
+    }
+  }
+  return response;
+};
+
 export function axiosHandler(token?: string) {
 
   let config: AxiosRequestConfig ;
@@ -101,11 +111,7 @@ export default function useAxios(token?: string) {
     
 
     axiosInst.interceptors.response.use(async function (response) {
-      if (response.status === 401) {
-        console.log('Error');
-        await signOut();
-      }
-      return response;
+      return await handleResponse(response);
     });
     
      

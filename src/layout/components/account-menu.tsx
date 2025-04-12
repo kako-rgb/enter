@@ -1,3 +1,5 @@
+'use client'
+
 import useClientUser from '@/hooks/useClientUser';
 import { USER } from '@/utils/types';
 import { Logout, Person } from '@mui/icons-material';
@@ -13,7 +15,7 @@ interface ACCOUNT_MENU_PROPS {
     open: boolean;
 }
 
-const AccountMenu = ({ anchorEl, closeMenu, open }: ACCOUNT_MENU_PROPS) => {
+export default function AccountMenu({ anchorEl, closeMenu, open }: ACCOUNT_MENU_PROPS) {
 
     const { push } = useRouter();
 
@@ -76,5 +78,3 @@ const AccountMenu = ({ anchorEl, closeMenu, open }: ACCOUNT_MENU_PROPS) => {
     </Menu>
   )
 }
-
-export default AccountMenu
